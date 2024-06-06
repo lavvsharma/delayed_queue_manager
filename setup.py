@@ -14,7 +14,13 @@ setup(
             "templates/*"
         ],
     },
-    install_requires=[],
+    install_requires=[
+        "Flask>=3.0.3",
+        "Flask-SQLAlchemy>=3.1.1",
+        "flask-socketio>=5.3.6",
+        "configparser>=7.0.0",
+        "loguru>=0.7.2"
+    ],
     author="Lav Sharma",
     author_email="lavsharma2016@gmail.com",
     description="Flask application which send the message after a delay implemented using socket",
