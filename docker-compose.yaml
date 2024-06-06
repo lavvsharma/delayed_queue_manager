@@ -1,0 +1,24 @@
+services:
+  delayed_queue_manager:
+    # build:
+    #   context: dockerfiles/delayed_queue_manager
+    image: lavsharma/delayed_queue_manager:1.0.0
+    ports:
+      - "50300:8000"
+    environment:
+      HOST_IP: "0.0.0.0"
+      HOST_PORT: 8000
+      MAX_WORKERS: 100
+      LOG_PATH: "/log/"
+      LOG_FILE_NAME: "delayed_queue_manager"
+    volumes:
+      - ./logs_volume:/log/
+    networks:
+      - lav
+
+volumes:
+  logs_volume:
+    driver: local
+
+networks:
+  lav:
