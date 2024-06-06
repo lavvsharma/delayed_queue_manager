@@ -3,14 +3,27 @@
 ## About
 
 - Queue Functionality:
-    - Allow items to be added to the queue with a delay (in seconds).
-    - Items should only become available after the specified delay.
+
+  - Allow items to be added to the queue with a delay (in seconds).
+  - Items should only become available after the specified delay.
 
 - User Interface:
-    - Develop a simple UI using HTML and JavaScript.
-    - The UI should allow users to submit a text string and delay time.
-    - On clicking "Run", the app should display the queued items automatically after their respective delays by polling
-      the backend.
+  - Develop a simple UI using HTML and JavaScript.
+  - The UI should allow users to submit a text string and delay time.
+  - On clicking "Run", the app should display the queued items automatically after their respective delays by polling
+    the backend.
+
+## Ready to use docker
+
+- Make sure you have docker installed on your machine.
+- Follow the steps [here](https://docs.docker.com/engine/install/) for more details on docker installation.
+- Follow the below steps after successful installation of docker
+
+```sh
+docker compose up
+```
+
+- Now you can access the application at `http://localhost:50300/`
 
 ## Installation
 
