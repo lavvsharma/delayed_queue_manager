@@ -1,11 +1,12 @@
-import concurrent.futures
+import queue
+import threading
 import time
 
 from flask import Flask, request, jsonify, render_template
 from flask_socketio import SocketIO
 from loguru import logger
 
-from configuration import lstr_host_ip, lint_host_port, lint_max_workers, lstr_log_path, lstr_log_file_name
+from configuration import lstr_host_ip, lint_host_port, lstr_log_path, lstr_log_file_name, lbool_debug_mode
 
 """Initialize the log path"""
 logger.add(f"{str(lstr_log_path)}{str(lstr_log_file_name)}.log")
@@ -16,8 +17,8 @@ app = Flask(__name__)
 """Bind Socket.IO to the Flask application"""
 socketio = SocketIO(app)
 
-"""ThreadPoolExecutor with maximum number of workers"""
-executor = concurrent.futures.ThreadPoolExecutor(max_workers=lint_max_workers)
+# Create a queue to hold messages and their delays
+message_queue = queue.Queue()
 
 
 @app.route('/')
@@ -26,7 +27,6 @@ def index():
     Description: This function loads the index.html page.
     """
     try:
-        """Render the HTML template for the index page"""
         return render_template("index.html")
     except Exception as exception:
         logger.exception(f"Exception - {str(exception)}")
@@ -43,10 +43,10 @@ def add_to_queue():
         lstr_message = ldict_data["message"]
         lint_delay_in_seconds = ldict_data["delay"]
 
-        """Submit the task to the thread pool"""
+        """Submit the task to the queue"""
         print(f"Message received - {str(lstr_message)}, delay in seconds - {str(lint_delay_in_seconds)}")
         logger.info(f"Message received - {str(lstr_message)}, delay in seconds - {str(lint_delay_in_seconds)}")
-        executor.submit(process_message, lint_delay_in_seconds, lstr_message)
+        message_queue.put((lstr_message, lint_delay_in_seconds))
         return jsonify({"status": "queued",
                         "message": lstr_message,
                         "delay": lint_delay_in_seconds})
@@ -64,10 +64,10 @@ def process_message(pint_delay_in_seconds: int,
     """
     try:
         time.sleep(pint_delay_in_seconds)
-        print(f"Processed message: {pstr_message}")
-        logger.info(f"Processed message: {pstr_message}")
         with app.app_context():
             socketio.emit("new_message", {"message": pstr_message}, namespace="/")
+        print(f"Processed message: {pstr_message}")
+        logger.info(f"Processed message: {pstr_message}")
     except Exception as exception:
         logger.exception(f"Exception - {str(exception)}")
 
@@ -84,5 +84,26 @@ def test_connect():
         logger.exception(f"Exception - {str(exception)}")
 
 
+def process_queue():
+    """
+    Description: This function continuously processes messages from the queue.
+    """
+    while True:
+        message, delay = message_queue.get()
+        if message is None:
+            break
+        threading.Thread(target=process_message, args=(delay, message)).start()
+        message_queue.task_done()
+
+
+"""Start the queue processing thread"""
+queue_thread = threading.Thread(target=process_queue)
+queue_thread.start()
+
 if __name__ == "__main__":
-    socketio.run(app, debug=True, host=lstr_host_ip, port=lint_host_port, allow_unsafe_werkzeug=True)
+    try:
+        socketio.run(app, debug=lbool_debug_mode, host=lstr_host_ip, port=lint_host_port, allow_unsafe_werkzeug=True)
+    finally:
+        """Signal the queue processing thread to exit"""
+        message_queue.put((None, 0))
+        queue_thread.join()
