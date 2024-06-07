@@ -2,7 +2,7 @@ services:
   delayed_queue_manager:
     # build:
     #   context: dockerfiles/delayed_queue_manager
-    image: lavsharma/delayed_queue_manager:1.0.0
+    image: lavsharma/delayed_queue_manager:1.1.1
     ports:
       - "50300:8000"
     environment:
