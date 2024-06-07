@@ -33,6 +33,12 @@ pip install delayed_queue_manager
 
 ## ChangeLog
 
+### v1.1.1
+
+```text
+1. Dependencies updated in setup.py.
+```
+
 ### v1.1.0
 
 ```text
