@@ -189,7 +189,6 @@ try:
     """ENVIRONMENT Variables"""
     lstr_host_ip = str(ldict_configuration["ENVIRONMENT"]["HOST_IP"])
     lint_host_port = int(ldict_configuration["ENVIRONMENT"]["HOST_PORT"])
-    lint_max_workers = int(ldict_configuration["ENVIRONMENT"]["MAX_WORKERS"])
 
     lstr_log_path = str(ldict_configuration["ENVIRONMENT"]["LOG_PATH"])
     lstr_log_file_name = str(ldict_configuration["ENVIRONMENT"]["LOG_FILE_NAME"])
